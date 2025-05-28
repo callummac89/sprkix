@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  // Relations
+  reviews       Review[]
+  WatchListItem WatchListItem[]
+  Reply         Reply[]
+
+  followers Follow[] @relation("followers")
+  following Follow[] @relation("following")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  follower    User     @relation("followers", fields: [followerId], references: [id])
+  followerId  String
+  following   User     @relation("following", fields: [followingId], references: [id])
+  followingId String
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Event {
+  id            String          @id @default(cuid())
+  title         String
+  slug          String          @unique
+  date          DateTime
+  promotion     String
+  posterUrl     String?
+  description   String?
+  type          String? // 'ppv' or 'tv'
+  tmdbId        Int? // ✅ This must be present
+  profightdbUrl String?
+  createdAt     DateTime        @default(now())
+  matches       Match[]
+  reviews       Review[]
+  WatchListItem WatchListItem[]
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  result    String?
+  winner    String?
+  loser     String?
+  type      String?
+  duration  String?
+  title     String?
+  order     Int?
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  userId    String
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  Reply     Reply[]
+}
+
+model WatchListItem {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, eventId])
+}
+
+model Reply {
+  id        String   @id @default(cuid())
+  comment   String
+  createdAt DateTime @default(now())
+  review    Review   @relation(fields: [reviewId], references: [id])
+  reviewId  String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+}

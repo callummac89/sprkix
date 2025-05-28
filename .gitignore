@@ -39,3 +39,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# Local Prisma client if generated locally
+/prisma/generated/
+/app/generated/
+
+# SQLite DB (if used locally for dev)
+/prisma/dev.db
+
+# macOS metadata (just in case)
+/Icon?
+
+# IDE folders (VS Code, JetBrains, etc)
+.vscode/
+.idea/
+
+# Build output (if not Next.js-managed)
+/dist

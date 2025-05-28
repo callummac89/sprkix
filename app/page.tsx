@@ -1,101 +1,160 @@
-import Image from "next/image";
+import { prisma } from '../lib/prisma'
+import Link from 'next/link'
+import Image from 'next/image'
+import { getUserFromCookie } from '../lib/auth';
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+export default async function HomePage() {
+    const user = await getUserFromCookie();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    const [events, reviews] = await Promise.all([
+        prisma.event.findMany({
+            orderBy: { date: 'desc' },
+            take: 5,
+        }),
+        prisma.review.findMany({
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            include: { event: true, user: true },
+        }),
+    ]);
+
+    const allEventsWithRatings = await prisma.event.findMany({
+        include: {
+            reviews: {
+                select: { rating: true },
+            },
+        },
+    });
+
+    const topRated = allEventsWithRatings
+        .map(event => ({
+            ...event,
+            averageRating:
+                event.reviews.reduce((sum, r) => sum + r.rating, 0) /
+                (event.reviews.length || 1),
+        }))
+        .sort((a, b) => b.averageRating - a.averageRating)
+        .slice(0, 5);
+
+    return (
+        <div>
+            {/* Hero with background image */}
+            <div className="relative text-center bg-[#0d1020] rounded-t-lg py-24 text-white overflow-hidden mb-12">
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src="https://media.themoviedb.org/t/p/w1066_and_h600_bestv2/vl5NLG3ArO2Q6eMXhP8FgMuCnnr.jpg"
+                        alt="Header Background"
+                        fill
+                        className="object-cover rounded-lg"
+                        priority
+                    />
+                    {/* Dark overlay */}
+                    <div className="absolute inset-0 bg-black opacity-60 rounded-lg" />
+                    {/* Bottom fade */}
+                    <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent to-[#0d1020] z-10" />
+                </div>
+
+                <div className="relative z-10 pt-40 pb-20">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight mb-3 drop-shadow-md">Welcome to sprkix</h1>
+                    <p className="text-gray-100 mb-8 text-lg drop-shadow-sm">Rate. Review. Discover Pro Wrestling.</p>
+
+                    <div className="flex justify-center gap-4">
+                        <Link href="/events" className="bg-yellow-400 text-black font-bold py-3 px-6 rounded shadow-md transition hover:bg-black hover:text-white">Explore Events</Link>
+                        { !user && (
+                          <Link href="/register" className="bg-yellow-400 text-black font-bold py-3 px-6 rounded shadow-md transition hover:bg-black hover:text-white">Sign Up</Link>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <h2 className="text-2xl font-bold mb-6">🆕 Latest Events</h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
+                {events.map(event => (
+                    <Link key={event.id} href={`/events/${event.slug}`} className="group block bg-white rounded-lg shadow transition transform hover:shadow-xl hover:scale-[1.02] duration-200 ease-in-out overflow-hidden">
+                        <div className="relative">
+                            <div className="absolute top-2 left-2 z-10">
+                                <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded">{event.promotion}</span>
+                            </div>
+                            <Image
+                                src={event.posterUrl || '/placeholder.png'}
+                                alt={event.title}
+                                width={500}
+                                height={750}
+                                className="w-full h-[350px] object-cover"
+                            />
+                        </div>
+                        <div className="p-3">
+                            <p className="text-xs text-gray-500">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                            <h3 className="text-sm font-semibold text-black group-hover:text-yellow-400">
+                                {event.title.replace(/– \d{4}(?:[-–]\d{2}){0,2}$/, '').trim()}
+                            </h3>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+
+            <h2 className="text-2xl font-bold mb-6">🏆 Top Rated Events</h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-10">
+                {topRated.map(event => (
+                    <Link key={event.id} href={`/events/${event.slug}`} className="group block bg-white rounded-lg shadow transition transform hover:shadow-xl hover:scale-[1.02] duration-200 ease-in-out overflow-hidden">
+                        <div className="relative">
+                            <div className="absolute top-2 left-2 z-10">
+                                <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded">{event.promotion}</span>
+                            </div>
+                            <Image
+                                src={event.posterUrl || '/placeholder.png'}
+                                alt={event.title}
+                                width={500}
+                                height={750}
+                                className="w-full h-[350px] object-cover"
+                            />
+                        </div>
+                        <div className="p-3">
+                            <p className="text-xs text-gray-500">{new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                            <h3 className="text-sm font-semibold text-black group-hover:text-yellow-400">
+                                {event.title.replace(/– \d{4}(?:[-–]\d{2}){0,2}$/, '').trim()}
+                            </h3>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+
+            <div className="flex justify-start mt-4 mb-10">
+              <Link href="/events" className="text-sm font-bold text-black hover:underline">See All</Link>
+            </div>
+
+            <h2 className="text-2xl font-bold mb-6 mt-16">⭐ Latest Reviews</h2>
+
+            <div className="grid gap-6 max-h-[500px] overflow-y-auto pr-1">
+                {reviews.map(review => (
+                    <Link key={review.id} href={`/events/${review.event.slug}`} className="bg-white p-4 rounded shadow flex gap-4 items-start hover:shadow-md transition">
+                        <Image
+                            src={review.event.posterUrl || '/placeholder.png'}
+                            alt={review.event.title}
+                            width={80}
+                            height={120}
+                            className="w-20 h-28 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                            <div className="text-sm text-gray-500 flex items-center justify-between">
+                              <span>
+                                <strong>{review.user.name}</strong> on{' '}
+                                <span className="text-black font-semibold underline">{review.event.title.replace(/– \d{4}(?:[-–]\d{2}){0,2}$/, '').trim()}</span>
+                              </span>
+                              <span className="ml-4 text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            {review.comment && (
+                                <p className="text-sm text-gray-800 mt-2 whitespace-pre-line">{review.comment}</p>
+                            )}
+                            <div className="mt-2 text-yellow-500 text-sm">
+                                {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                            </div>
+                        </div>
+                    </Link>
+                ))}
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    )
 }
