@@ -8,7 +8,9 @@ import ReplyForm from '../../components/ReplyForm'
 import { getUserFromServerCookie } from '../../../lib/server-auth'
 import MatchList from '../../components/MatchList'
 
-type Props = {
+import { type PageProps } from 'next';
+
+type Props = PageProps & {
   params: {
     slug: string;
   };
