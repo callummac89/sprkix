@@ -1,6 +1,6 @@
 import { prisma } from '../../../../../lib/prisma'
 import { notFound } from 'next/navigation'
-import { getUserFromCookie } from '../../../../../lib/auth'
+import { getUserFromServerCookie } from '../../../../../lib/auth'
 import ReviewCard from '@/components/ReviewCard'
 
 export default async function PopularReviewsPage({ params, searchParams }: { params: { slug: string }, searchParams: { page?: string } }) {
@@ -37,7 +37,7 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
         take: 5,
     })
 
-    const user = await getUserFromCookie()
+    const user = await getUserFromServerCookie()
 
     // Pagination logic
     const totalPages = Math.ceil(await prisma.review.count({ where: { eventId: event.id } }) / 5);
