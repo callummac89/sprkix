@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '../../../../../lib/prisma'
 import { jwtVerify } from 'jose'
 
-export async function POST(req: NextRequest, { params }: { params: { matchId: string } }) {
+export async function POST(req: NextRequest) {
     try {
         const token = req.cookies.get('token')?.value
         if (!token) {
@@ -25,7 +25,9 @@ export async function POST(req: NextRequest, { params }: { params: { matchId: st
             return NextResponse.json({ error: 'Invalid token' }, { status: 403 })
         }
 
-        const matchId = params.matchId
+        const segments = req.nextUrl.pathname.split('/')
+        const matchId = segments[segments.indexOf('matches') + 1]
+
         if (!matchId) {
             console.error('[Params] Missing matchId')
             return NextResponse.json({ error: 'Match ID not provided' }, { status: 400 })
