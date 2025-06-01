@@ -8,8 +8,8 @@ import ReplyForm from '../../components/ReplyForm'
 import { getUserFromServerCookie } from '../../../lib/server-auth'
 import MatchList from '../../components/MatchList'
 
-export default async function EventPage({ params }: { params: { slug: string } }) {
-    const slug = params.slug // ✅ You do NOT await `params`
+export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
     const event = await prisma.event.findUnique({
         where: { slug },
         include: {
