@@ -3,7 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this import is needed for getUserFromCookie
 
-export default async function PublicProfilePage({ params }: { params: { slug: string } }) {
+export default async function PublicProfilePage(props: Promise<{ params: { slug: string } }>) {
+    const { params } = await props;
     const user = await prisma.user.findFirst({
         where: {
             slug: {

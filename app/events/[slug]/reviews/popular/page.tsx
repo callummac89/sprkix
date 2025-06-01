@@ -94,6 +94,6 @@ export default async function PopularReviewsPage(props: { params: Promise<{ slug
                 )}
             </div>
             <Pagination />
-        </div> 
+        </div>
     )
 }
