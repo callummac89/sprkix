@@ -1,10 +1,10 @@
 import { prisma } from '../../../lib/prisma'
-import { getUserFromCookie } from '../../../lib/auth'
+import { getUserFromServerCookie } from '../../../lib/auth'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
     const { targetUserId } = await req.json()
-    const currentUser = await getUserFromCookie()
+    const currentUser = await getUserFromServerCookie()
 
     if (!currentUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
