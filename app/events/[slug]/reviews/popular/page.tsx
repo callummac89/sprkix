@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation'
 import { getUserFromServerCookie } from '../../../../../lib/auth'
 import ReviewCard from '@/components/ReviewCard'
 
-export default async function PopularReviewsPage({ params, searchParams }: { params: { slug: string }, searchParams: { page?: string } }) {
+export default async function PopularReviewsPage({ params, searchParams }: { params: Promise<{ slug: string }>, searchParams: { page?: string } }) {
+    const { slug } = await params;
+
     const pageParam = searchParams?.page
     let page = 1
     if (pageParam) {
@@ -14,7 +16,7 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
     }
 
     const event = await prisma.event.findUnique({
-        where: { slug: params.slug },
+        where: { slug },
     })
 
     if (!event) return notFound()
