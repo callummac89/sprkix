@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
         const type = form.get('type') as string
         const duration = parseInt(form.get('duration') as string)
 
-        const matchId = req.nextUrl.pathname.split('/').pop()
+        const matchId = req.nextUrl.pathname.split('/').slice(-2)[0]
 
         if (!matchId) {
             return NextResponse.json({ error: 'Missing match ID' }, { status: 400 })
