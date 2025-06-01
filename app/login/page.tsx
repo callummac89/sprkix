@@ -18,7 +18,7 @@ export default function LoginPage() {
         })
 
         if (res.redirected) {
-            window.location.href = res.url
+            window.location.assign(res.url)
         } else {
             const data = await res.json()
             setError(data.error || 'Login failed')

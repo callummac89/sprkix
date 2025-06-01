@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 import Header from './components/Header'
 
 export const metadata = {
-    title: 'Superkick',
+    title: 'sprkix',
     description: 'Discover. Rate. Share Pro Wrestling Events.',
 }
 

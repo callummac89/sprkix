@@ -1,10 +1,10 @@
 import { prisma } from '../../lib/prisma'
-import { getUserFromCookie } from '../../lib/auth'
+import { getUserFromServerCookie } from '../../lib/server-auth'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default async function ProfilePage() {
-  const user = await getUserFromCookie()
+  const user = await getUserFromServerCookie()
   if (!user) return <p className="text-center mt-10">You must be logged in.</p>
 
   const [reviews, watchList] = await Promise.all([
@@ -20,7 +20,7 @@ export default async function ProfilePage() {
   ])
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-6">
+    <div className="max-w-10xl mx-auto">
       {/* Profile Header */}
       <div className="flex items-center gap-6 mb-12 bg-white p-6 rounded shadow">
         <div className="w-20 h-20 flex items-center justify-center rounded-full bg-gray-300 text-3xl font-bold text-gray-700">
@@ -108,19 +108,6 @@ export default async function ProfilePage() {
         {watchList.length === 0 && <p className="text-sm text-gray-400">Your watch list is empty.</p>}
       </div>
 
-      {/* Favorite Matches Section */}
-      <h2 className="text-2xl font-semibold mb-4">🔥 Favorite Matches</h2>
-      <div className="bg-white p-4 rounded shadow mb-12 min-h-[100px] flex items-center justify-center text-gray-500">
-        {/* Placeholder content */}
-        No favorite matches added yet.
-      </div>
-
-      {/* Your Lists Section */}
-      <h2 className="text-2xl font-semibold mb-4">📋 Your Lists</h2>
-      <div className="bg-white p-4 rounded shadow min-h-[100px] flex items-center justify-center text-gray-500">
-        {/* Placeholder content */}
-        You haven't created any lists yet.
-      </div>
     </div>
   )
 }

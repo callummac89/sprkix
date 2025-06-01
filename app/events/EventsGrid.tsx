@@ -16,6 +16,7 @@ export default function EventsGrid({ events }: { events: Event[] }) {
     const [search, setSearch] = useState('');
     const [yearFilter, setYearFilter] = useState('All');
     const [promotionFilter, setPromotionFilter] = useState('All');
+    const [showUpcomingOnly, setShowUpcomingOnly] = useState(false);
 
     const uniqueYears = Array.from(new Set(events.map(e => new Date(e.date).getFullYear()))).sort();
     const uniquePromotions = Array.from(new Set(events.map(e => e.promotion))).sort();
@@ -29,7 +30,8 @@ export default function EventsGrid({ events }: { events: Event[] }) {
           normalizedPromotion.includes(normalizedSearch);
         const matchesYear = yearFilter === 'All' || new Date(event.date).getFullYear().toString() === yearFilter;
         const matchesPromotion = promotionFilter === 'All' || event.promotion === promotionFilter;
-        return matchesSearch && matchesYear && matchesPromotion;
+        const matchesUpcoming = !showUpcomingOnly || new Date(event.date) > new Date();
+        return matchesSearch && matchesYear && matchesPromotion && matchesUpcoming;
     });
 
     // Pagination state
@@ -42,7 +44,7 @@ export default function EventsGrid({ events }: { events: Event[] }) {
     );
 
     return (
-        <main className="px-6 py-10 max-w-7xl mx-auto">
+        <main className="max-w-7xl mx-auto">
             <h1 className="text-3xl font-bold mb-6">Events</h1>
 
             <div className="flex flex-wrap gap-4 mb-8">
@@ -76,6 +78,18 @@ export default function EventsGrid({ events }: { events: Event[] }) {
                         <option key={promo} value={promo}>{promo}</option>
                     ))}
                 </select>
+                <label className="flex items-center gap-2 text-white text-sm">
+                  <input
+                    type="checkbox"
+                    checked={showUpcomingOnly}
+                    onChange={(e) => {
+                      setCurrentPage(1);
+                      setShowUpcomingOnly(e.target.checked);
+                    }}
+                    className="w-5 h-5"
+                  />
+                  Upcoming
+                </label>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -83,29 +97,31 @@ export default function EventsGrid({ events }: { events: Event[] }) {
                     <Link
                         key={event.id}
                         href={`/events/${event.slug}`}
-                        className="bg-white rounded-lg shadow transition transform hover:shadow-xl hover:scale-[1.02] duration-200 ease-in-out overflow-hidden"
+                        className="group block bg-white rounded-lg shadow transition transform hover:shadow-xl hover:scale-[1.02] duration-200 ease-in-out overflow-hidden border border-transparent hover:border-yellow-300 p-[2px]"
                     >
-                        <div className="relative">
-                            <img
-                                src={event.posterUrl || '/placeholder.png'}
-                                alt={event.title}
-                                className="w-full aspect-[3/4] object-cover"
-                            />
-                            <span className="absolute top-2 left-2 text-xs bg-yellow-400 text-black font-semibold px-2 py-1 rounded">
-                {event.promotion}
-              </span>
-                        </div>
-                        <div className="p-3">
-                            <h2 className="text-sm font-semibold leading-tight line-clamp-2 text-black">
-                                {event.title.replace(/–\s\d{4}(\s–\s\d{2}\s–\s\d{2}|-\d{2}-\d{2})$/, '').trim()}
-                            </h2>
-                            <p className="text-xs text-gray-500">
-                              {new Date(event.date).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              })}
-                            </p>
+                        <div className="bg-white rounded-lg overflow-hidden">
+                            <div className="relative">
+                                <img
+                                    src={event.posterUrl || '/placeholder.png'}
+                                    alt={event.title}
+                                    className="w-full aspect-[3/4] object-cover"
+                                />
+                                <span className="absolute top-2 left-2 text-xs bg-yellow-400 text-black font-semibold px-2 py-1 rounded">
+                                    {event.promotion}
+                                </span>
+                            </div>
+                            <div className="p-3">
+                                <h2 className="text-sm font-semibold leading-tight line-clamp-2 text-black">
+                                    {event.title.replace(/–\s\d{4}(\s–\s\d{2}\s–\s\d{2}|-\d{2}-\d{2})$/, '').trim()}
+                                </h2>
+                                <p className="text-xs text-gray-500">
+                                    {new Date(event.date).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </p>
+                            </div>
                         </div>
                     </Link>
                 ))}

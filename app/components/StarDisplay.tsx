@@ -1,3 +1,5 @@
+'use client'
+
 export default function StarDisplay({ rating }: { rating: number }) {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 >= 0.5;

@@ -39,31 +39,35 @@ export default function ReviewCard({
             <div
                 className={`${
                     review.Reply.length > 3
-                        ? 'max-h-48 overflow-y-auto border border-gray-300 rounded'
+                        ? 'max-h-48 overflow-y-auto'
                         : ''
-                } mt-2 space-y-2`}
+                } mt-4 space-y-3`}
             >
                 {review.Reply.map((reply) => (
                     <div
                         key={reply.id}
-                        className="w-full p-2 bg-gray-100 rounded text-sm text-black"
+                        className="w-full flex items-start gap-3 p-3 bg-[#1a1a1a] rounded-lg text-sm text-white"
                     >
-                        <div className="flex justify-between">
-              <span className="text-black">
-                <span className="mr-1">🗨️</span>
-                <strong>{reply.user.name}</strong>:
-              </span>
-                            <span className="text-sm text-gray-400">
-                {new Date(reply.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                })}
-              </span>
+                        <div className="flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-yellow-400 text-black flex items-center justify-center text-xs font-bold">
+                                {reply.user.name?.charAt(0).toUpperCase()}
+                            </div>
                         </div>
-                        <p className="text-black">{reply.comment}</p>
+                        <div className="flex flex-col flex-grow">
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-xs font-semibold text-white">{reply.user.name}</span>
+                                <span className="text-xs text-gray-400">
+                                    {new Date(reply.createdAt).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: 'numeric',
+                                        minute: '2-digit',
+                                    })}
+                                </span>
+                            </div>
+                            <p className="text-sm text-gray-100">{reply.comment}</p>
+                        </div>
                     </div>
                 ))}
             </div>

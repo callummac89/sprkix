@@ -1,21 +1,16 @@
+// lib/auth.ts — Server-only helper. Do not import in client or `pages/` components!
 import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { prisma } from './prisma'
 
-export async function getUserFromCookie() {
-    const cookieStore = cookies() // ✅ no await needed in app router
-
-    const token = cookieStore.get('token')?.value
+export async function getUserFromServerCookie() {
+    const token = cookies().get('token')?.value
     if (!token) return null
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-        const user = await prisma.user.findUnique({
-            where: { id: (decoded as any).id },
-        })
-        return user
-    } catch (err) {
-        console.error('❌ JWT verification failed in getUserFromCookie():', err)
+        const { userId } = jwt.verify(token, process.env.JWT_SECRET!)
+        return await prisma.user.findUnique({ where: { id: userId } })
+    } catch {
         return null
     }
 }

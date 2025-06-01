@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function ReviewForm({ eventId, user }: { eventId: string, user: any }) {
+export default function ReviewForm({ eventId, user, isUpcoming }: { eventId: string, user: any, isUpcoming?: boolean }) {
     const [comment, setComment] = useState('')
     const [rating, setRating] = useState(0)
     const [submitting, setSubmitting] = useState(false)
@@ -17,7 +17,7 @@ export default function ReviewForm({ eventId, user }: { eventId: string, user: a
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 eventId,
-                rating,
+                rating: isUpcoming ? null : rating,
                 comment,
                 userId: user.id,
                 userName: user.name,
@@ -36,9 +36,10 @@ export default function ReviewForm({ eventId, user }: { eventId: string, user: a
           className="w-full border p-2 rounded text-black"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Write your review..."
+          placeholder={isUpcoming ? "Write your comment..." : "Write your review..."}
       />
-            <div className="flex gap-1">
+            {!isUpcoming && (
+              <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                     <button
                         type="button"
@@ -49,13 +50,14 @@ export default function ReviewForm({ eventId, user }: { eventId: string, user: a
                         ★
                     </button>
                 ))}
-            </div>
+              </div>
+            )}
             <button
                 type="submit"
                 disabled={submitting}
                 className="bg-yellow-400 text-black px-4 py-2 rounded font-semibold"
             >
-                {submitting ? 'Posting...' : 'Post Review'}
+                {submitting ? 'Posting...' : isUpcoming ? 'Post Comment' : 'Post Review'}
             </button>
         </form>
     )

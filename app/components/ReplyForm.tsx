@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function ReplyForm({ reviewId, onReply }: { reviewId: string, onReply?: () => void }) {
+export default function ReplyForm({ reviewId, onReply, isUpcoming }: { reviewId: string, onReply?: () => void, isUpcoming?: boolean }) {
     const [comment, setComment] = useState('')
     const [loading, setLoading] = useState(false)
 
@@ -11,7 +11,8 @@ export default function ReplyForm({ reviewId, onReply }: { reviewId: string, onR
 
         await fetch('/api/replies', {
             method: 'POST',
-            body: JSON.stringify({ reviewId, comment }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reviewId, comment, rating: isUpcoming ? null : undefined }),
         })
 
         setComment('')
@@ -26,14 +27,14 @@ export default function ReplyForm({ reviewId, onReply }: { reviewId: string, onR
           onChange={(e) => setComment(e.target.value)}
           className="w-full text-sm border border-gray-300 rounded px-3 py-2 text-black"
           rows={2}
-          placeholder="Write a reply..."
+          placeholder={isUpcoming ? "Write a comment..." : "Write a reply..."}
       />
             <button
                 disabled={loading}
                 type="submit"
                 className="bg-yellow-400 text-black px-4 py-2 rounded font-semibold hover:bg-yellow-300 transition"
             >
-                {loading ? 'Posting...' : 'Post Reply'}
+                {loading ? 'Posting...' : isUpcoming ? 'Post Comment' : 'Post Reply'}
             </button>
         </form>
     )

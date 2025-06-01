@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 
 export default function Header({ user }: { user: any }) {
@@ -16,10 +17,13 @@ export default function Header({ user }: { user: any }) {
         <>
         <header className="bg-black text-white sticky top-0 z-50 shadow-md">
             <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-                <Link href="/" className="text-2xl font-bold text-white lowercase">sprkix</Link>
+                <Link href="/" className="flex items-center">
+                  <Image src="/img/logo.png" alt="Sprkix Logo" width={100} height={26} priority />
+                </Link>
                 <nav className="flex items-center">
                   <div className="hidden md:flex space-x-6 items-center">
                     <Link href="/events" className="hover:text-yellow-400">Events</Link>
+                    <Link href="/wrestlers" className="hover:text-yellow-400">Wrestlers</Link>
                     {user ? (
                         <div className="flex items-center gap-4">
                             <button onClick={logout} className="hover:text-red-600">Logout</button>
@@ -48,6 +52,7 @@ export default function Header({ user }: { user: any }) {
         {menuOpen && (
           <div className="md:hidden fixed top-16 left-0 right-0 bg-black text-white px-6 py-4 space-y-3 z-50">
             <Link href="/events" className="block hover:text-yellow-400">Events</Link>
+            <Link href="/wrestlers" className="block hover:text-yellow-400">Wrestlers</Link>
             {user ? (
               <>
                 <Link href="/profile" className="block hover:text-yellow-400">Profile</Link>

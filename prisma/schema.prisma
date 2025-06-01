@@ -11,6 +11,7 @@ model User {
   id        String   @id @default(cuid())
   name      String?
   email     String   @unique
+  isAdmin   Boolean  @default(false)
   password  String
   slug      String   @unique
   createdAt DateTime @default(now())
@@ -20,8 +21,9 @@ model User {
   WatchListItem WatchListItem[]
   Reply         Reply[]
 
-  followers Follow[] @relation("followers")
-  following Follow[] @relation("following")
+  followers   Follow[]      @relation("followers")
+  following   Follow[]      @relation("following")
+  MatchRating MatchRating[]
 }
 
 model Follow {
@@ -43,8 +45,8 @@ model Event {
   promotion     String
   posterUrl     String?
   description   String?
-  type          String? // 'ppv' or 'tv'
-  tmdbId        Int? // ✅ This must be present
+  type          String?
+  tmdbId        Int?
   profightdbUrl String?
   createdAt     DateTime        @default(now())
   matches       Match[]
@@ -53,17 +55,28 @@ model Event {
 }
 
 model Match {
-  id        String   @id @default(cuid())
-  eventId   String
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  result    String?
-  winner    String?
-  loser     String?
-  type      String?
-  duration  String?
-  title     String?
-  order     Int?
-  createdAt DateTime @default(now())
+  id           String             @id @default(cuid())
+  title        String
+  result       String?
+  rating       Float?
+  duration     Int?
+  type         String?
+  eventId      String
+  event        Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  participants MatchParticipant[]
+  ratings      MatchRating[]
+  createdAt    DateTime           @default(now())
+}
+
+model MatchRating {
+  id      String @id @default(cuid())
+  rating  Int
+  userId  String
+  matchId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
 }
 
 model Review {
@@ -80,9 +93,9 @@ model Review {
 
 model WatchListItem {
   id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  event     Event    @relation(fields: [eventId], references: [id])
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   eventId   String
   createdAt DateTime @default(now())
 
@@ -93,8 +106,28 @@ model Reply {
   id        String   @id @default(cuid())
   comment   String
   createdAt DateTime @default(now())
-  review    Review   @relation(fields: [reviewId], references: [id])
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   reviewId  String
   user      User     @relation(fields: [userId], references: [id])
   userId    String
+}
+
+model Wrestler {
+  id        String             @id @default(cuid())
+  name      String
+  slug      String             @unique
+  imageUrl  String?
+  bio       String?
+  matches   MatchParticipant[]
+  createdAt DateTime           @default(now())
+}
+
+model MatchParticipant {
+  id         String   @id @default(cuid())
+  matchId    String
+  match      Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  wrestlerId String
+  wrestler   Wrestler @relation(fields: [wrestlerId], references: [id], onDelete: Cascade)
+  team       Int?
+  isWinner   Boolean?
 }

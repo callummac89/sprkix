@@ -19,6 +19,8 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
 
     if (!event) return notFound()
 
+    const isUpcoming = new Date(event.date) > new Date();
+
     const skip = (page - 1) * 5
 
     const reviews = await prisma.review.findMany({
@@ -49,7 +51,7 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
           Previous
         </a>
         <span>
-          Page {page} of {totalPages}
+          Page {page} of {totalPages} {isUpcoming ? 'comments' : 'reviews'}
         </span>
         <a
           href={`?page=${Math.min(totalPages, page + 1)}`}
@@ -61,7 +63,7 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
     );
 
     return (
-        <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="max-w-10xl mx-auto">
             <div className="w-full flex gap-6 items-start mb-6">
                 <img
                     src={event.posterUrl || '/placeholder.png'}
@@ -74,6 +76,9 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
                     <h1 className="text-3xl font-bold">
                         {event.title.replace(/–\s\d{4}-\d{2}-\d{2}$/, '')}
                     </h1>
+                    <p className="text-sm text-gray-500 mb-1">
+                      {isUpcoming ? 'Comments' : 'Reviews'}
+                    </p>
                 </div>
             </div>
             <div className="space-y-6">
@@ -82,7 +87,7 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
                         <ReviewCard key={review.id} review={review} user={user} />
                     ))
                 ) : (
-                    <p className="text-gray-500 italic">No reviews yet.</p>
+                    <p className="text-gray-500 italic">No {isUpcoming ? 'comments' : 'reviews'} yet.</p>
                 )}
             </div>
             <Pagination />
