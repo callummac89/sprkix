@@ -93,6 +93,6 @@ export default async function PopularReviewsPage({ params, searchParams }: { par
                 )}
             </div>
             <Pagination />
-        </div>
+        </div> 
     )
 }
