@@ -51,7 +51,7 @@ export default async function EventPage({ params }: Props) {
     const userId = user?.id;
 
     const processedMatches = event.matches.map(match => {
-        const userRating = match.ratings.find(r => r.userId === user.id)?.rating || 0;
+        const userRating = match.ratings.find(r => r.userId === userId)?.rating || 0;
         const averageRating = match.ratings.length
             ? match.ratings.reduce((sum, r) => sum + r.rating, 0) / match.ratings.length
             : 0;
