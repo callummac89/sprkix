@@ -1,7 +1,7 @@
 import { prisma } from '../../../../../../lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest) {
     try {
         const form = await req.formData()
         const title = form.get('title') as string
@@ -9,8 +9,14 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         const type = form.get('type') as string
         const duration = parseInt(form.get('duration') as string)
 
+        const matchId = req.nextUrl.pathname.split('/').pop()
+
+        if (!matchId) {
+            return NextResponse.json({ error: 'Missing match ID' }, { status: 400 })
+        }
+
         await prisma.match.update({
-            where: { id: params.id },
+            where: { id: matchId },
             data: {
                 title,
                 result,
