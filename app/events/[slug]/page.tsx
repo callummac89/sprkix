@@ -8,13 +8,11 @@ import ReplyForm from '../../components/ReplyForm'
 import { getUserFromServerCookie } from '../../../lib/server-auth'
 import MatchList from '../../components/MatchList'
 
-import { type PageProps } from 'next';
-
-type Props = PageProps & {
-  params: {
+interface Props {
+  params: Awaited<{
     slug: string;
-  };
-};
+  }>;
+}
 
 export default async function EventPage({ params }: Props) {
     const slug = params.slug // ✅ You do NOT await `params`
