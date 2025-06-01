@@ -1,7 +1,7 @@
 import { prisma } from '../../../lib/prisma'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getUserFromCookie } from '../../../lib/auth' // Assuming this import is needed for getUserFromCookie
+import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this import is needed for getUserFromCookie
 
 export default async function PublicProfilePage({ params }: { params: { slug: string } }) {
     const user = await prisma.user.findFirst({
@@ -21,7 +21,7 @@ export default async function PublicProfilePage({ params }: { params: { slug: st
         },
     });
 
-    const currentUser = await getUserFromCookie();
+    const currentUser = await getUserFromServerCookie();
     // Default isFollowing to false; only check DB if both users present and different
     let isFollowing = false;
     if (currentUser?.id && user?.id && currentUser.id !== user.id) {
