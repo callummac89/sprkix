@@ -2,6 +2,7 @@ import { prisma } from '../../../lib/prisma'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this import is needed for getUserFromCookie
+import { type Metadata } from 'next'
 
 type PageProps = {
   params: {
@@ -9,7 +10,11 @@ type PageProps = {
   };
 };
 
-export default async function PublicProfilePage({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  return { title: `User – ${params.slug}` }
+}
+
+export default async function PublicProfilePage({ params }: { params: { slug: string } }) {
     const user = await prisma.user.findFirst({
         where: {
             slug: {
