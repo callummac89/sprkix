@@ -9,9 +9,9 @@ import { getUserFromServerCookie } from '../../../lib/server-auth'
 import MatchList from '../../components/MatchList'
 
 interface Props {
-  params: Awaited<{
+  params: {
     slug: string;
-  }>;
+  };
 }
 
 export default async function EventPage({ params }: Props) {
