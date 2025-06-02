@@ -1,10 +1,12 @@
+import { type PageProps } from 'next'
 import { prisma } from '../../../lib/prisma'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this import is needed for getUserFromCookie
 import { type Metadata } from 'next'
 
-interface SlugParams {
+
+interface SlugParams extends PageProps {
   params: { slug: string }
 }
 
