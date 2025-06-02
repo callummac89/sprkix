@@ -1,4 +1,3 @@
-import { type PageProps } from 'next'
 import { prisma } from '../../../lib/prisma'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -6,15 +5,11 @@ import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this imp
 import { type Metadata } from 'next'
 
 
-type PageProps = {
-  params: { slug: string }
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   return { title: `User – ${params.slug}` }
 }
 
-export default async function PublicProfilePage({ params }: PageProps) {
+export default async function PublicProfilePage({ params }: { params: { slug: string } }) {
     const user = await prisma.user.findFirst({
         where: {
             slug: {
