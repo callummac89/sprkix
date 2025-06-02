@@ -59,7 +59,7 @@ export default async function EditEventPage({ params }: { params: any }) {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700">Type</label>
-                  <input type="text" name="type" defaultValue={match.type} className="w-full p-2 border rounded" />
+                  <input type="text" name="type" defaultValue={match.type || ''} className="w-full p-2 border rounded" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-700">Duration</label>
