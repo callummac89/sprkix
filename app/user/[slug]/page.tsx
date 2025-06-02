@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title: `User – ${params.slug}` }
 }
 
-export default async function PublicProfilePage({ params }: { params: { slug: string } }) {
+export default async function PublicProfilePage({ params }: PageProps) {
     const user = await prisma.user.findFirst({
         where: {
             slug: {
