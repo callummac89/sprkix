@@ -1,9 +1,15 @@
 
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
+
 import { prisma } from '../../../../../lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function EditEventPage({ params }: { params: { id: string } }) {
+export default async function EditEventPage({ params }: PageProps) {
   const { id } = params;
   const event = await prisma.event.findUnique({ where: { id } })
   if (!event) return notFound()
