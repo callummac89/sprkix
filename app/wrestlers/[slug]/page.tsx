@@ -2,8 +2,11 @@ import { prisma } from '@lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+type WrestlerPageProps = {
+  params: { slug: string }
+}
 
-export default async function WrestlerPage({ params }: { params: { slug: string } }) {
+export default async function WrestlerPage({ params }: WrestlerPageProps) {
     const wrestler = await prisma.wrestler.findUnique({
         where: { slug: params.slug },
         include: {
