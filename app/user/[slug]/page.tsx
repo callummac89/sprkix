@@ -6,15 +6,15 @@ import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this imp
 import { type Metadata } from 'next'
 
 
-interface SlugParams extends PageProps {
+type PageProps = {
   params: { slug: string }
 }
 
-export async function generateMetadata({ params }: SlugParams): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   return { title: `User – ${params.slug}` }
 }
 
-export default async function PublicProfilePage({ params }: SlugParams) {
+export default async function PublicProfilePage({ params }: PageProps) {
     const user = await prisma.user.findFirst({
         where: {
             slug: {
