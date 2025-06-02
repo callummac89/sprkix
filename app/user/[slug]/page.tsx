@@ -4,18 +4,15 @@ import Link from 'next/link'
 import { getUserFromServerCookie } from '../../../lib/auth' // Assuming this import is needed for getUserFromCookie
 import { type Metadata } from 'next'
 
-interface SlugParams {
-  params: {
-    slug: string;
-  };
+export async function generateMetadata(
+  { params }: { params: { slug: string } }
+): Promise<Metadata> {
+  return { title: `User – ${params.slug}` }
 }
 
-export async function generateMetadata(props: SlugParams): Promise<Metadata> {
-  return { title: `User – ${props.params.slug}` }
-}
-
-export default async function PublicProfilePage(props: SlugParams) {
-    const { params } = props;
+export default async function PublicProfilePage(
+  { params }: { params: { slug: string } }
+) {
     const user = await prisma.user.findFirst({
         where: {
             slug: {
