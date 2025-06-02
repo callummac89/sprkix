@@ -40,7 +40,7 @@ export default async function EditEventPage({ params }: { params: { id: string }
               <div className="flex flex-wrap gap-3 mt-2">
                 {match.participants.map(p => (
                   <Link
-                    key={p.id}
+                    key={p.wrestler.id}
                     href={`/wrestlers/${p.wrestler.slug}`}
                     className={`px-3 py-1 rounded text-sm font-medium ${p.isWinner ? 'bg-green-500 text-black' : 'bg-gray-200 text-gray-900'}`}
                   >
