@@ -3,7 +3,7 @@ import { prisma } from '../../../../../lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function EditEventPage({ params }) {
+export default async function EditEventPage({ params }: { params: { id: string } }) {
   const event = await prisma.event.findUnique({ where: { id: params.id } })
   if (!event) return notFound()
 
