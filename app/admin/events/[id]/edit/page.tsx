@@ -3,14 +3,9 @@ import { prisma } from '../../../../../lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
-interface EditEventPageParams {
-  params: {
-    id: string;
-  };
-}
-
-export default async function EditEventPage({ params }: EditEventPageParams) {
-  const event = await prisma.event.findUnique({ where: { id: params.id } })
+export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const event = await prisma.event.findUnique({ where: { id } })
   if (!event) return notFound()
 
   const matches = await prisma.match.findMany({
